@@ -2,9 +2,9 @@
 
 internal class TaskMenager
 {
-    private List<string> _list = new List<string>();
+    private List<string> _list = new List<string>() ;
 
-    public List<string> TaskList { get => _list; }
+    public List<string> TaskList { get => _list; set => _list = value;}
 
     public bool IsRunning { get; set; }
 
@@ -12,13 +12,16 @@ internal class TaskMenager
     public TaskMenager()
     {
         IsRunning = true;
+        LoadTasks();
     }
     public void Start()
     {
         while (IsRunning)
         {
             // menu
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("What do you want to do?");
+            Console.ResetColor();
             Console.WriteLine("1. See a list of tasks");
             Console.WriteLine("2. Add a new task");
             Console.WriteLine("3. Mark a task as completed");
@@ -30,7 +33,9 @@ internal class TaskMenager
             
             do
             {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("Enter your choice: ");
+                Console.ResetColor();
                 userInput = Console.ReadLine();
             } while (!int.TryParse(userInput, out choice));
 
@@ -70,6 +75,7 @@ internal class TaskMenager
             {
                 IsRunning = BackToMenu();
             }
+            SaveToFile();
             
 
         }
@@ -81,6 +87,7 @@ internal class TaskMenager
     
     private void SeeTasks()
     {
+        Console.ForegroundColor = ConsoleColor.Cyan;
         if (TaskList.Count == 0)
         {
             Console.WriteLine("You have no tasks!");
@@ -88,6 +95,7 @@ internal class TaskMenager
         else
         {
             Console.WriteLine("List of tasks: ");
+            Console.ResetColor();
             for (int i = 0; i < TaskList.Count; i++)
             {
                 Console.WriteLine($"{i+1}. {TaskList[i]}");
@@ -99,6 +107,7 @@ internal class TaskMenager
     private void AddTask(string task)
     {
         TaskList.Add(task);
+        SaveToFile();
     }
 
     private void MarkTaskCompleted(int index)
@@ -124,5 +133,19 @@ internal class TaskMenager
             return false;
         
         
+    }
+
+    private void SaveToFile()
+    {
+        File.WriteAllLines("tl.txt", TaskList);
+        Console.WriteLine("Tasks are saved.");
+    }
+
+    private void LoadTasks()
+    {
+        if (File.Exists("tl.txt"))
+        {
+            TaskList = File.ReadAllLines("tl.txt").ToList();
+        }
     }
 }
